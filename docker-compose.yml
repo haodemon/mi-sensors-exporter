@@ -1,0 +1,12 @@
+services:
+  mi_sensor_service:
+    build: .
+    container_name: mi_sensor_service
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+    network_mode: "host"
+    tty: true
+    volumes:
+      - .:/usr/src/app
+    command: python3 /usr/src/app/fetch_and_serve_sensors.py --config devices.json --conn-frequency 60

@@ -10,12 +10,10 @@
 A docker compose image with Prometheus exporter written in Python for Xiaomi Mi LYWSD03MMC
 
 ### Features
-- Prometheus-ready
-- Grafana dashboard
-- Exported metrics:
-  - battery
-  - humidity
-  - temperature
+Features:
+- Monitor your sensors inside a docker image
+- Export metrics into Prometheus
+- Visualize them via Grafana
 
 <img src="grafana/img/dashboard.png" alt="Image description"/>
 

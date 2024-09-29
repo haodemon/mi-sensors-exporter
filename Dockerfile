@@ -15,7 +15,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Copy the Python script into the container
-COPY fetch_and_serve_sensors.py /usr/src/app/fetch_and_serve_sensors.py
+COPY app/sensors_exporter.py /usr/src/app/sensors_exporter.py
 
 # Install Python dependencies
 RUN pip3 install prometheus_client lywsd03mmc --break-system-packages
@@ -24,4 +24,4 @@ RUN pip3 install prometheus_client lywsd03mmc --break-system-packages
 WORKDIR /usr/src/app
 
 # Default command to run the service script
-CMD ["python3", "fetch_and_serve_sensors.py", "--config", "devices.json", "--conn-frequency", "60"]
+CMD ["python3", "sensors_exporter.py", "--config", "devices.json", "--conn-frequency", "60"]

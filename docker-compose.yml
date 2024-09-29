@@ -8,5 +8,5 @@ services:
     network_mode: "host"
     tty: true
     volumes:
-      - .:/usr/src/app
-    command: python3 /usr/src/app/fetch_and_serve_sensors.py --config devices.json --conn-frequency 60
+      - app:/usr/src/app
+    command: python3 /usr/src/app/sensors_exporter.py --config devices.json --conn-frequency 60

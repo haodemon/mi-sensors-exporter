@@ -1,0 +1,7 @@
+{
+  "devices": {
+    "guest-room": "A4:C1:38:BE:BD:18",
+    "master-bedroom": "A4:C1:38:BB:FA:C6"
+  },
+  "interval": 60
+}

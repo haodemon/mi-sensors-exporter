@@ -35,37 +35,39 @@ class SensorService:
             for name, f in futures.items():
                 sensor = f.result()
                 if sensor is not None:
-                    print(f"{name}: {sensor.temperature}°C, humidity: {sensor.humidity}%, battery: {sensor.battery}%")
+                    logging.info(f"{name}: {sensor.temperature}°C, humidity: {sensor.humidity}%, battery: {sensor.battery}%")
                     TEMPERATURE_GAUGE.labels(device_id=name).set(sensor.temperature)
                     HUMIDITY_GAUGE.labels(device_id=name).set(sensor.humidity)
                     BATTERY_GAUGE.labels(device_id=name).set(sensor.battery)
                 else:
-                    print(f"Failed to fetch data for {name}")
+                    logging.info(f"Failed to fetch data for {name}")
 
     @staticmethod
     def _try_update_client(client):
         try:
             return client.data
         except Exception as e:
-            logging.error(f"Failed to fetch data for {client}: {e}")
+            logging.warn(f"Failed to fetch data for {client}: {e}")
 
 
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Read data from Xiaomi Mi LYWSD03MMC sensors')
-    parser.add_argument('--config', type=str, help='Json with devices ({name: mac, [name: mac,]...})', required=True)
-    parser.add_argument('--conn-frequency', type=int, default=60, help='Frequency in seconds to read data from sensors')
+    parser.add_argument('--config',
+                        type=str,
+                        help='Json with devices ({name: mac, [name: mac,]...})',
+                        required=True)
     return parser.parse_args()
 
 
-def run(devices: dict, sleep_time: int):
+def run(devices: dict, interval: int):
     # Start HTTP server for Prometheus metrics
     start_http_server(8083)
 
     sensors = SensorService(devices=devices)
     while True:
         sensors.try_fetch_data()
-        time.sleep(sleep_time)
+        time.sleep(interval)
 
 
 if __name__ == '__main__':
@@ -76,11 +78,14 @@ if __name__ == '__main__':
         sys.exit(1)
 
     with open(args.config, 'r') as f:
-        devices = json.load(f)
-        print("Devices to read data from: " + str(devices))
+        config = json.load(f)
+        logging.info("Configuration: " + str(config))
 
-    sleep_time = args.conn_frequency
-    print(f"Reading data from sensors every {sleep_time} seconds")
+    devices = config.get('devices', {})
+    if not devices:
+        logging.error("No devices found in the configuration")
+        sys.exit(1)
+    interval = config.get('interval', 60)
+    logging.info(f"Reading data from sensors every {interval} seconds")
 
-    run(devices=devices, sleep_time=sleep_time)
-
+    run(devices=devices, interval=interval)
